@@ -26,12 +26,9 @@ ord_tag_name_await_tracking = 'Awaiting Tracking'
 ord_get_dropship_orders_params = {
 	'tag' : ord_tag_name_await_tracking
 }
-
-def iprint(str):
-	print(str, flush=True)
 	
 def log(str):
-	iprint(str)
+	print(str, flush=True)
 	with open(log_file, 'a') as file:
 		file.write(f"{str}\n\r")
 
