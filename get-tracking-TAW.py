@@ -23,7 +23,6 @@ ord_url = '***REMOVED***'
 ord_tag_id_await_tracking = '30068'
 ord_tag_name_await_tracking = 'Awaiting Tracking'
 
-### GET ALL AWAITING TRACKING ORDERS FROM ORDORO ###
 ord_get_dropship_orders_params = {
 	'tag' : ord_tag_name_await_tracking
 }
@@ -36,6 +35,7 @@ def log(str):
 	with open(log_file, 'a') as file:
 		file.write(f"{str}\n\r")
 
+### GET ALL AWAITING TRACKING ORDERS FROM ORDORO ###
 log("Requesting all orders with 'Awaiting Tracking' from ordoro...")
 
 r = requests.get(f"{ord_url}/order/", params=ord_get_dropship_orders_params, headers=ord_headers)
