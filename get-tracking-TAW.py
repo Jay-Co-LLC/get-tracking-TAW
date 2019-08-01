@@ -35,7 +35,7 @@ def log(str):
 ### GET ALL AWAITING TRACKING ORDERS FROM ORDORO ###
 log("Requesting all orders with 'Awaiting Tracking' from ordoro...")
 
-r = requests.get(f"{ord_url}/order/", params=ord_get_dropship_orders_params, headers=ord_headers)
+r = requests.get(f"{ord_url}/order", params=ord_get_dropship_orders_params, headers=ord_headers)
 robj = json.loads(r.content)
 
 ord_orders = robj['order']
@@ -43,7 +43,7 @@ ord_orders = robj['order']
 log(f"Found {len(ord_orders)} to process.")
 
 for eachOrder in ord_orders:
-	PONumber = eachOrder['order_id']
+	PONumber = eachOrder['order_number']
 	taw_order_id = ''
 	
 	log(f"\n\r---- {PONumber} ----")
@@ -57,7 +57,7 @@ for eachOrder in ord_orders:
 	log(f"[{PONumber}] Requesting tracking info from TAW...")
 			
 	# ASK FOR TRACKING INFO FROM TAW
-	r = requests.post(f"{taw_url}/GetTrackingInfo", data=f"UserID={taw_u}&Password={taw_p}&OrderNumber={taw_order_id}&PONumber={PONumber}", headers=taw_headers)
+	r = requests.post(f"{taw_url}/GetTrackingInfo", data=f"UserID={taw_u}&Password={taw_p}&OrderNumber=***REMOVED***&PONumber=***REMOVED***", headers=taw_headers)
 	
 	log(f"[{PONumber}] Response from TAW:\n\r{r.content.decode('UTF-8')}")
 
@@ -73,35 +73,36 @@ for eachOrder in ord_orders:
 		
 		log(f"[{PONumber}] Ship date: {data['ship_date']}")
 		
-		data['tracking'] = {}
-		data['tracking']['tracking'] = record.find('TrackNum').text.strip()
+		data['tracking_number'] = record.find('TrackNum').text.strip()
 				
-		log(f"[{PONumber}] Tracking number: {data['tracking']['tracking']}")
+		log(f"[{PONumber}] Tracking number: {data['tracking_number']}")
 		
 		# IF NO TRACKING NUMBER, LOG IT AND GO ON TO THE NEXT ONE
-		if (data['tracking']['tracking'] == ""):
+		if (data['tracking_number'] == ""):
 			log(f"[{PONumber}] No tracking number found. Skipping.")
 			continue
 		
-		data['tracking']['vendor'] = record.find('Type').text.strip()
+		data['carrier_name'] = record.find('Type').text.strip()
 		
 		# IF NO VENDOR, LOG IT AND GO ON TO THE NEXT ONE
-		if (data['tracking']['vendor'] == ""):
+		if (data['carrier_name'] == ""):
 			log(f"[{PONumber}] No vendor found. Skipping.")
 			continue
+			
+		data['shipping_method'] = "ground"
+		data['cost'] = 14
 		
-		log(f"[{PONumber}] Vendor: {data['tracking']['vendor']}")
+		log(f"[{PONumber}] Vendor: {data['carrier_name']}")
 		log(f"[{PONumber}] Sending to ordoro...")
 		
 		# SEND TRACKING INFO TO ORDORO
-		shipment_id = eachOrder['shipments'][0]['shipment_id']
-		r = requests.post(f"{ord_url}/shipment/{shipment_id}/tracking/", data=json.dumps(data), headers=ord_headers)
+		r = requests.post(f"{ord_url}/order/{PONumber}/shipping_info", data=json.dumps(data), headers=ord_headers)
 		
 		log(f"[{PONumber}] Response from ordoro:\n\r{r.content.decode('UTF-8')}")
 		log(f"[{PONumber}] Removing 'Awaiting Tracking' tag...")
 		
 		# DELETE AWAITING TRACKING TAG FROM ORDER
-		r = requests.delete(f"{ord_url}/order/{PONumber}/tag/{ord_tag_id_await_tracking}/", headers=ord_headers)
+		r = requests.delete(f"{ord_url}/order/{PONumber}/tag/{ord_tag_id_await_tracking}", headers=ord_headers)
 		
 		log(f"[{PONumber}] Response from ordoro:\n\r{r.content.decode('UTF-8')}")
 
