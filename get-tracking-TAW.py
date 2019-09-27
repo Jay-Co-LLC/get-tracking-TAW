@@ -61,7 +61,7 @@ for eachOrder in ord_orders:
 	log(f"[{PONumber}] Requesting tracking info from TAW...")
 			
 	# ASK FOR TRACKING INFO FROM TAW
-	r = requests.post(f"{taw_url}/GetTrackingInfo", data=f"UserID={taw_u}&Password={taw_p}&OrderNumber=***REMOVED***&PONumber=***REMOVED***", headers=taw_headers)
+	r = requests.post(f"{taw_url}/GetTrackingInfo", data=f"UserID={taw_u}&Password={taw_p}&OrderNumber={taw_order_id}&PONumber={PONumber}", headers=taw_headers)
 	
 	log(f"[{PONumber}] Response from TAW:\n\r{r.content.decode('UTF-8')}")
 
