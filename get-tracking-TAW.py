@@ -2,23 +2,27 @@ import requests
 import json
 import datetime
 import xml.etree.ElementTree as ET
+import config as cfg
 
 log_file = f"LOG-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
 
-taw_u = '***REMOVED***'
-taw_p = '***REMOVED***'
-taw_url = '***REMOVED***'
+test_taw_u = cfg.test_taw_username
+test_taw_p = cfg.test_taw_password
+
+taw_u = cfg.taw_username
+taw_p = cfg.taw_password
+taw_url = cfg.taw_url
 
 taw_headers = {
 	'Content-Type' : 'application/x-www-form-urlencoded',
 }
 
 ord_headers = {
-	'Authorization' : '***REMOVED***',
+	'Authorization' : cfg.ord_auth,
 	'Content-Type' : 'application/json'
 }
 
-ord_url = '***REMOVED***'
+ord_url = cfg.ord_url
 
 ord_tag_id_await_tracking = '30068'
 ord_tag_name_await_tracking = 'Awaiting Tracking'
@@ -69,7 +73,12 @@ for eachOrder in ord_orders:
 		log(f"[{PONumber}] Tracking info found! Parsing...")
 		
 		data = {}
-		data['ship_date'] = record.find('ShipDate').text
+		
+		order_date_str = record.find('OrderDate').text
+		order_date_obj = datetime.datetime.strptime(order_date_str, '%m/%d/%Y')
+		order_date_str = order_date_obj.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+		
+		data['ship_date'] = order_date_str
 		
 		log(f"[{PONumber}] Ship date: {data['ship_date']}")
 		
