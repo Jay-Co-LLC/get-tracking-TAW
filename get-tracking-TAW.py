@@ -36,7 +36,7 @@ def log(str):
 	with open(log_file, 'a') as file:
 		file.write(f"{str}\n\r")
 
-### GET ALL AWAITING TRACKING ORDERS FROM ORDORO ###
+#### GET ALL AWAITING TRACKING ORDERS FROM ORDORO ###
 log("Requesting all orders with 'Awaiting Tracking' from ordoro...")
 
 r = requests.get(f"{ord_url}/order", params=ord_get_dropship_orders_params, headers=ord_headers)
